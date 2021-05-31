@@ -1,0 +1,16 @@
+{
+  "name": "task-app",
+  "version": "1.0.0",
+  "description": "This is a task application built in node.js using express framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev" : "nodemon mongodb.js",
+    "start":"node mongodb.js"
+  },
+  "author": "abhishek chaudhary",
+  "license": "ISC",
+  "dependencies": {
+    "mongodb": "^3.6.8"
+  }
+}
