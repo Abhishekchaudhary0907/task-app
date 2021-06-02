@@ -12,60 +12,27 @@ MongoClient.connect(url,{useUnifiedTopology:true},(error,client) => {
 
     const db = client.db(databseName);
 
-    db.collection("users").insertMany([
-    {
-           name:"jack",
-          age:28},
-    {
-        name:"abhi",
-        age:23
-    },
-    {
-        name:"nammu",
-        age:21
-    },{
-        name:"nam",
-        age:11
-    }
-    ]).then((result) => {
-        console.log("document inserted")
+   
+
+    db.collection("users").deleteOne({_id: new ObjectID("60b6172e717e492928e37a5e")})
+    .then((result) => {
+        console.log(result.deletedCount)
     }).catch((error) => {
-        console.log("error")
+        console.log("can not be deleted")
+    });
+
+    db.collection("tasks").deleteMany({description:"take bath"})
+    .then((result) => {
+        console.log(result.deletedCount)
+    }).catch((error) => {
+        console.log("doesnt work")
     })
 
-    db.collection("users").findOne({_id: new ObjectID("60b5fa1a99527d38283980f1")})
+    db.collection("users").findOneAndReplace({name:"abhi"},{name:"abhishek"})
     .then((result) => {
         console.log(result)
     }).catch((error) => {
-        console.log("cant connect");
-    })
-
-    db.collection("users").updateOne({_id: new ObjectID("60b5fa1a99527d38283980f1")},
-    {
-        $set:{
-            name:"abhis"
-        },
-
-        $inc:{               // increase age by 88
-            age:88
-        }
-    }).then((result) => {
-        console.log(result)
-    }).catch((error) => {
-        console.log("error")
-    })
-
-    db.collection("tasks").updateMany({completed:"false"},
-    {
-        $set:{
-            completed:"true"
-        }
-    }
-    
-    ).then((result) => {
-        console.log(result)
-    }).catch((error) => {
-        console.log("error")
-    })
+        console.log("error occurd")
+    });
 
 })
