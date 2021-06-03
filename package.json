@@ -5,12 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev" : "nodemon mongodb.js",
-    "start":"node mongodb.js"
+    "dev": "nodemon mongodb.js",
+    "start": "node mongodb.js"
   },
   "author": "abhishek chaudhary",
   "license": "ISC",
   "dependencies": {
-    "mongodb": "^3.6.8"
+    "mongodb": "^3.6.8",
+    "mongoose": "^5.12.12",
+    "validator": "^13.6.0"
   }
 }
