@@ -3,24 +3,35 @@ const Schema = mongoose.Schema;
 const validator = require("validator");
 
 mongoose.connect("mongodb://127.0.0.1:27017/task-app-api",{
-    useUnifiedTopology: true,
-    useCreateIndex:true
+    useNewUrlParser: true,
+     useCreateIndex:true
 })
 
-const User = mongoose.model('User',{
+const userSchema = new Schema({
     name:{
         type: String,
         required: true,
+        trim: true
         
     },
     email:{
         type: String,
         required: true,
         unique: true,
+        trim: true,
         validate(value){
             if(!validator.isEmail(value)){
-
                 throw new Error("please provide valid email");
+            }
+        }
+    },
+    password:{
+        type: String,
+        required: true,
+        trim : true,
+        validate(value){
+            if(value.length < 6){
+                throw new Error("password should be greater than 6")
             }
         }
     },
@@ -33,12 +44,24 @@ const User = mongoose.model('User',{
             }
         }
     }
-});
+})
+
+userSchema.methods.findSimilarAge = function(cb){
+    return mongoose.model("User").find({age: this.age}, cb);
+}
+
+const User = mongoose.model('User',userSchema);
+// create a instance method which will work all of the User
 
 const me = new User({
-    name:"abhi",
-    age:1,
-    email:"abihi@gmail.com"
+    name:"frodo",
+    email:"frodo@gmail.com",
+    password:"frodowaagins123",
+    age:19
+})
+
+me.findSimilarAge((err, me) => {
+    console.log(me)
 })
 
 me.save().then((result) => {
@@ -46,6 +69,7 @@ me.save().then((result) => {
 }).catch((error) => {
     console.log("error")
 })
+
 
 // const Task = mongoose.model("Task",{
 //     description: {
