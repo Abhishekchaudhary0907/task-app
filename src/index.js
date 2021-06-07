@@ -42,6 +42,21 @@ app.get('/users/:id', (req,res) => {
     })
 })
 
+app.patch('/users/:id', (req, res) => {
+    const _id = req.params.id;
+    User.findByIdAndUpdate(_id,req.body).then((user) => {
+        if(!user){
+            return res.status(400).send();
+        }
+
+        res.status(201).send(user);
+    }).catch((e) => {
+        res.status(500).send("error from the server");
+    })
+})
+
+
+
 app.post('/tasks', (req,res) => {
     const task = new Task(req.body);
 
@@ -75,6 +90,20 @@ app.get('/tasks/:id',(req,res) => {
     }).catch(() => {
         res.status(500).send();
     })
+})
+
+app.patch('/tasks/:id',(req,res) => {
+  const _id = req.params.id;
+  
+  Task.findByIdAndUpdate(_id, req.body).then((task) => {
+      if(!task){
+         return  res.status(400).send()
+      }
+      res.status(201).send(task);
+
+  }).catch((e) => {
+      res.status(500).send()
+  })
 })
 
 app.listen(portNumber,() => {
