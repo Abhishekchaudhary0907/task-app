@@ -47,9 +47,20 @@ app.get('/users/:id', async(req,res) => {
 })
 
 app.patch('/users/:id', async (req, res) => {
+
+    const updates = Object.keys(req.body);
+    const allowUpdates = ['name','email','password','age'];
+    const isValidUpdate = updates.forEach((update) => {
+        return allowUpdates.includes(update);
+    })
+
+    if(!isValidUpdate){
+        return res.status(400).send({error: "invalid updates"})
+    }
+
     const _id = req.params.id;
     try{
-        const user = await User.findByIdAndUpdate(_id,req.body)
+        const user = await User.findByIdAndUpdate(_id,req.body,{new: true, runValidators: true})
         if(!user){
            return res.status(400).send()
         }
@@ -59,6 +70,22 @@ app.patch('/users/:id', async (req, res) => {
         res.status(500).send();
     }
    
+})
+
+app.delete('/users/:id',async(req, res) => {
+
+    const _id = req.params.id;
+    try{
+        const user = await User.findByIdAndDelete(_id)
+        if(!user){
+            return res.status(404).send();
+        }
+
+        res.send(user);
+    }catch(e){
+        res.status(500).send(e);
+    }
+    
 })
 
 app.post('/tasks', async(req,res) => {
@@ -100,10 +127,20 @@ app.get('/tasks/:id',(req,res) => { // async me nhi implement kiya baad me krung
 })
 
 app.patch('/tasks/:id',async(req,res) => {
-  const _id = req.params.id;
+
+    const updates = Object.keys(req.body);
+    const validUpdate = ['description','completed'];
+    const isValidUpdate = updates.forEach((update) => {
+        return validUpdate.includes(update);
+    })
+    if(!isValidUpdate){
+        return res.status(400).send({error:"invalid updates!"})
+    }
+
+    const _id = req.params.id;
   
   try{
-    const task = await Task.findByIdAndUpdate(_id, req.body,{new: true})
+    const task = await Task.findByIdAndUpdate(_id, req.body,{new: true,runValidators: true})
 
     if(!task){
         res.status(400).send();
@@ -113,6 +150,22 @@ app.patch('/tasks/:id',async(req,res) => {
         res.status(500).send(e)
   }
   
+})
+
+app.delete('/tasks/:id', async(req, res) => {
+    const _id = req.params.id;
+
+    try{
+
+        const task = await Task.findByIdAndDelete(_id);
+        if(!task){
+            return res.status(404).send()
+        }
+        res.send(task);
+
+    }catch(e){
+        res.status(500).send();
+    }
 })
 
 app.listen(portNumber,() => {
