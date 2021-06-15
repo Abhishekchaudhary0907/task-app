@@ -32,3 +32,13 @@
 // console.log(hash);
 // console.log(bcrypt.compareSync("cabhishek",hash))
 // console.log(bcrypt.compareSync("abhishek",hash))
+
+const jwt = require('jsonwebtoken');
+function myFunction(){
+    const token = jwt.sign({_id:"abc123"},"thisismytoken",{expiresIn:"7 days"});
+    console.log(token);
+    const isVerified = jwt.verify(token,"thisismytoken");
+    console.log(isVerified);
+}
+
+myFunction();

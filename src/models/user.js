@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
+const jwt = require('jsonwebtoken');
 
 const userSchema = new Schema({
     name:{
@@ -39,8 +40,24 @@ const userSchema = new Schema({
                 throw new Error("age can not be negative")
             }
         }
-    }
+    },
+    tokens:[{
+        token:{
+            type: String,
+            required: true
+        }
+    }]
 })
+
+userSchema.methods.generateAuthToken = async function(){
+    const user = this;
+    const token = jwt.sign({_id:user._id.toString()},"thisismytoken",{expiresIn:"7 days"});
+    user.tokens = user.tokens.concat({token});
+
+    await user.save();
+
+    return token;
+}
 
 userSchema.statics.findByCredential = async function(email, password){
     const user = await User.findOne({email});
