@@ -11,6 +11,11 @@ const taskSchema = new Schema({
     completed:{
         type: Boolean,
         required: true
+    },
+
+    authorization:{
+        type: String,
+        required: true
     }
 })
 
