@@ -3,6 +3,7 @@ const validator = require('validator');
 const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
 const jwt = require('jsonwebtoken');
+const Task = require('./task');
 
 const userSchema = new Schema({
     name:{
@@ -50,6 +51,12 @@ const userSchema = new Schema({
     }]
 })
 
+userSchema.virtual('tasks',{
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+})
+
 userSchema.methods.generateAuthToken = async function(){
     const user = this;
     const token = jwt.sign({_id:user._id.toString()},"thisismytoken",{expiresIn:"7 days"});
@@ -74,6 +81,15 @@ userSchema.statics.findByCredential = async function(email, password){
     return user;
 }
 
+userSchema.methods.toJSON = function() {
+    const user = this; 
+    const userObject = user.toObject();
+    delete userObject.password;
+    delete userObject.tokens;
+
+    return userObject;
+}
+
 userSchema.pre('save', async function(next){
     const user = this;
     
@@ -84,6 +100,12 @@ userSchema.pre('save', async function(next){
     next();
 })
 
+// remove user tasks before removing user
+
+userSchema.pre('remove', async function(next){
+    const user = this
+    await Task.deleteMany({owner: user._id})
+})
 // insatance method
 
 userSchema.methods.findSimilarAge = function(cb){
