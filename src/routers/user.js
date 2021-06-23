@@ -3,6 +3,21 @@ const User = require("../models/user");
 const router = new express.Router()
 const auth = require('../middlewares/auth');
 
+// multer library is use for uploading image and other non textual document in express application
+const multer = require('multer');
+const upload = multer({
+    dest: 'avatar',
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb){
+        if(!file.originalname.match(/\.(jpg|jpeg|png)$/)){
+            return cb(new Error("please upload jpg or jpeg or png file"))
+        }
+        cb(undefined, true);
+    }
+})
+
 router.post('/users',async(req,res) =>{
 
     const user = new User(req.body);
@@ -94,6 +109,15 @@ router.delete('/users/me',auth, async(req, res) => {
     
 });
 
-
+function errorMiddleware(next){
+    throw new Error(" this is the error handler function");
+}
+router.post('/users/me/avatar',errorMiddleware,async(req, res) => {
+    try{
+        res.send()
+    }catch(e){
+        res.status(400).send()
+    }
+})
 
 module.exports = router;
