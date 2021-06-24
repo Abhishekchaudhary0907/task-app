@@ -2,11 +2,12 @@ const express = require('express');
 const User = require("../models/user");
 const router = new express.Router()
 const auth = require('../middlewares/auth');
+const sharp = require('sharp');
 
 // multer library is use for uploading image and other non textual document in express application
 const multer = require('multer');
 const upload = multer({
-    dest: 'avatar',
+    
     limits: {
         fileSize: 1000000
     },
@@ -109,15 +110,43 @@ router.delete('/users/me',auth, async(req, res) => {
     
 });
 
-function errorMiddleware(next){
-    throw new Error(" this is the error handler function");
-}
-router.post('/users/me/avatar',errorMiddleware,async(req, res) => {
+
+router.post('/users/me/avatar',auth,upload.single('upload'), async(req, res) => {
+    // sharp module for formatting the image
+    const buffer = await sharp(req.file.buffer).resize({width:250, height: 250}).png().toBuffer();
+    req.user.avatar = buffer
+
+    await req.user.save()
     try{
         res.send()
     }catch(e){
         res.status(400).send()
     }
+},(error, req, res,next) => {
+    res.status(400).send({error: error.message})
 })
 
+router.delete('/users/me/avatar', auth, async(req, res) => {
+    try{
+        req.user.avatar = undefined
+        await req.user.save();
+        res.send()
+    }catch(e){
+        res.status(400).send();
+    }
+})
+
+router.get('/users/:id/avatar', async(req, res) => {
+    try{
+        const user = await User.findById(req.params.id)
+        if(!user || !user.avatar){
+           throw new Error("user AVATAR not found")
+        }
+        res.set('Content-Type','image/png');
+        res.send(user.avatar);
+
+    }catch(e){
+        res.status(400).send();
+    }
+})
 module.exports = router;
